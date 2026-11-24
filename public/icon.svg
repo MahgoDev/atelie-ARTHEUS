@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+<title>Símbolo do Ateliê ARTHEUS</title>
+<rect width="256" height="256" rx="0" fill="#251e31"/>
+<g fill="none" stroke="#cba886" stroke-linejoin="round">
+<path d="M60 202V115a68 68 0 0 1 136 0v87M69 197v-82a59 59 0 0 1 118 0v82" stroke-width="2.2"/>
+<path d="M53 202h150m-139-7h17m94 0h17M58 114h15m110 0h15" stroke-width="2"/>
+<path d="m128 29 7 10-7 9-7-9Z" fill="#d4b598" stroke-width="1"/>
+<path d="m128 76 39 58-39 57-39-57Z" fill="#90719e" stroke="#e4cba9" stroke-width="2.7"/>
+<path d="m128 76-12 55 12 60-39-57Z" fill="#b598ba" stroke="#e4cba9" stroke-width="1.4"/>
+<path d="m128 76 12 55-12 60 39-57Z" fill="#69577f" stroke="#e4cba9" stroke-width="1.4"/>
+<path d="m89 134 27-3h24l27 3" stroke="#e4cba9" stroke-width="1.7"/>
+</g><path d="m165 86 2.4 7.6 6.6 2.4-6.6 2.4-2.4 7.6-2.4-7.6-6.6-2.4 6.6-2.4Z" fill="#e5ccc4"/>
+</svg>

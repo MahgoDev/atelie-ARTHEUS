@@ -1,0 +1,368 @@
+.read-shell {
+  color: var(--text);
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.read-shell button, .read-shell summary {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.read-shell button {
+  padding: .6rem .9rem;
+  border: 1px solid var(--line);
+  border-radius: .65rem;
+  background: var(--surface);
+}
+
+.read-shell button:hover:not(:disabled), .read-shell button[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.read-shell button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.read-shell :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.read-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.6rem;
+  flex-wrap: wrap;
+}
+
+.read-head h1, .read-leaf h2, .read-body h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+}
+
+.read-head h1 {
+  margin: .35rem 0 0;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: 1.04;
+  letter-spacing: -.045em;
+}
+
+.read-kicker, .read-leaf-top, .read-caption {
+  font-size: .69rem;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.read-kicker,.read-caption {
+  color: var(--gold);
+}
+
+.read-layout {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+.read-main {
+  min-width: 0;
+}
+
+.read-index, .read-saved {
+  border: 1px solid var(--line);
+  border-radius: .75rem;
+  background: var(--surface);
+}
+
+.read-index summary, .read-saved summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  padding: .5rem .85rem;
+  font-weight: 600;
+}
+
+.read-index nav, .read-saved > div {
+  padding: .25rem .45rem .65rem;
+  display: grid;
+  gap: .22rem;
+}
+
+.read-index button, .read-saved button {
+  background: transparent;
+  text-align: left;
+}
+
+.read-index button {
+  border: 1px solid transparent;
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  align-items: baseline;
+  padding: .5rem;
+  line-height: 1.3;
+}
+
+.read-index button span {
+  font-size: .72rem;
+  color: var(--muted);
+}
+
+.read-index button[aria-current="page"] {
+  border-color: var(--line);
+  color: var(--accent);
+}
+
+.read-leaf {
+  position: relative;
+  border-radius: 1.05rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: clamp(1.15rem, 4vw, 3.7rem);
+}
+
+.read-leaf::after {
+  content:"";
+  pointer-events: none;
+  position: absolute;
+  inset: .35rem;
+  border: 1px solid var(--line);
+  opacity: .62;
+  border-radius: .82rem;
+}
+
+.read-leaf-top {
+  color: var(--muted);
+  display:flex;
+  justify-content:space-between;
+}
+
+.read-ornament {
+  display:block;
+  width: 4.8rem;
+  height: 4.4rem;
+  margin: 1.5rem 0 .25rem;
+  color:var(--gold);
+}
+
+.read-leaf h2 {
+  font-size: clamp(1.85rem, 4.4vw, 3.7rem);
+  line-height: 1.06;
+  letter-spacing: -.04em;
+  margin: .6rem 0 1.4rem;
+  color:var(--text);
+}
+
+.read-body {
+  max-width: 60ch;
+}
+
+.read-body h3 {
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  color: var(--accent);
+  margin: 1.5rem 0 .3rem;
+}
+
+.read-body p, .read-body li {
+  line-height: 1.65;
+}
+
+.read-body p {
+  margin: .35rem 0 .85rem;
+}
+
+.read-body ul,.read-body ol {
+  padding-left: 1.4rem;
+}
+
+.read-body li {
+  margin-block: .36rem;
+}
+
+.read-leaf-end {
+  margin: 2rem auto 0;
+  color:var(--gold);
+  width:4.5rem;
+  text-align:center;
+  position:relative;
+}
+
+.read-leaf-end::before,.read-leaf-end::after {
+  content:"";
+  position:absolute;
+  width: 1.4rem;
+  height:1px;
+  background:var(--line);
+  top:50%;
+}
+
+.read-leaf-end::before {
+  left:0;
+}
+
+.read-leaf-end::after {
+  right:0;
+}
+
+.read-controls,.read-actions {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.5rem;
+  margin-block:.9rem;
+}
+
+.read-controls {
+  justify-content:space-between;
+}
+
+.read-controls span {
+  color:var(--muted);
+  font-size:.8rem;
+}
+
+.read-actions {
+  justify-content:flex-start;
+}
+
+.read-book .read-leaf {
+  text-align:center;
+}
+
+.read-book .read-ornament {
+  margin:2.9rem auto 1.1rem;
+  width:6.5rem;
+  height:6rem;
+}
+
+.read-book .read-body {
+  max-width: 35rem;
+  margin:0 auto;
+}
+
+.read-book .read-body p, .read-book blockquote {
+  font: 400 clamp(1.2rem, 2.6vw, 1.8rem)/1.53 Georgia,serif;
+}
+
+.read-book blockquote {
+  color:var(--accent);
+  margin:1rem auto 0;
+}
+
+.read-book blockquote:last-child {
+  color:var(--gold);
+}
+
+.read-book .read-leaf-end {
+  margin-block:2.8rem 1rem;
+}
+
+.read-focused {
+  position:fixed;
+  inset:0;
+  z-index:50;
+  overflow:auto;
+  overscroll-behavior:contain;
+  margin:0;
+  max-width:none;
+  background:var(--bg);
+  padding:max(1.2rem,env(safe-area-inset-top)) max(1.2rem,env(safe-area-inset-right)) max(1.2rem,env(safe-area-inset-bottom)) max(1.2rem,env(safe-area-inset-left));
+}
+
+.read-focused .read-layout {
+  display:block;
+  max-width:45rem;
+  margin:auto;
+}
+
+.read-focused .read-head {
+  max-width:45rem;
+  margin:0 auto 1.2rem;
+}
+
+.read-focused .read-index,.read-focused .read-kicker,.read-focused .read-saved {
+  display:none;
+}
+
+.read-focused .read-head h1 {
+  font-size:1.2rem;
+}
+
+.read-dna {
+  display:block;
+  width:100%;
+  max-width:34rem;
+  margin:1rem auto;
+}
+
+.read-lines {
+  fill:none;
+  stroke:var(--gold);
+  stroke-width:1;
+}
+
+.read-dna rect,.read-dna-core {
+  fill:var(--bg);
+  stroke:var(--line);
+}
+
+.read-dna-core {
+  stroke:var(--gold);
+}
+
+.read-dna text {
+  text-anchor:middle;
+  fill:var(--text);
+  font: 14px system-ui,sans-serif;
+}
+
+.read-dna text.read-dna-name {
+  fill:var(--gold);
+  font: 15px Georgia,serif;
+}
+
+.read-body .read-journey {
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem .7rem;
+  padding:0;
+  list-style:none;
+}
+
+.read-journey li:not(:last-child)::after {
+  content:' →';
+  color:var(--gold);
+}
+
+@media (min-width:1100px) {
+  .read-layout {
+    grid-template-columns:minmax(12rem, .66fr) minmax(0, 2fr);
+    gap:1.3rem;
+  }
+  .read-index {
+    position:sticky;
+    top:1.3rem;
+    max-height:75vh;
+    overflow:auto;
+  }
+}
+
+@media (max-width:440px) {
+  .read-actions button {
+    flex:1 1 auto;
+  }
+  .read-controls button {
+    padding-inline:.65rem;
+  }
+  .read-head {
+    margin-bottom:1rem;
+  }
+}
+

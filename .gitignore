@@ -1,0 +1,11 @@
+node_modules/
+dist/
+referencias/
+references/
+*.pdf
+*.zip
+*.jpeg
+*.jpg
+.env*
+.DS_Store
+
