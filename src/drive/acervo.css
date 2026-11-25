@@ -1,0 +1,18 @@
+.drive-bar,.drive-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.drive-bar .actions,.drive-dialog .section-title{margin:0}
+.drive-state{border:1px solid var(--line);border-radius:20px;padding:6px 12px;color:var(--accent)}
+.drive-connect{max-width:650px}.drive-connect h2{margin-top:10px}.drive-sigil{color:var(--gold)}
+.drive-connect details{margin:16px 0}.drive-connect details label{margin-top:10px}
+[data-status],[data-warnings],[data-feedback]{margin:12px 0;color:var(--muted);overflow-wrap:anywhere}
+[data-warnings]:not(:empty),[data-status].error{color:var(--gold)}
+.drive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:16px}
+.drive-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:left;display:flex;flex-direction:column;align-items:stretch;min-width:0}
+.drive-card strong{font:22px var(--display);margin-top:10px;overflow-wrap:anywhere}.drive-card small{margin:5px 0}
+.drive-cover{display:grid;place-items:center;aspect-ratio:4/3;background:var(--surface2);border-radius:7px;overflow:hidden;color:var(--gold);width:100%;padding:0}
+.drive-cover img{width:100%;height:100%;object-fit:contain}.drive-title{margin:24px 0}.drive-title p{white-space:pre-wrap;overflow-wrap:anywhere}
+.drive-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:18px}.drive-filters>label{flex:1 1 130px;min-width:0}
+.drive-dialog{width:min(570px,93vw);overscroll-behavior:contain}.drive-dialog form{display:grid;gap:14px;margin-top:18px}
+.drive-dialog input[type=file]{max-width:100%}.drive-large,.upload-preview{max-width:100%;max-height:40vh;object-fit:contain;margin:auto;display:block}
+.drive-full{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border:0;border-radius:0;padding:max(18px,env(safe-area-inset-top)) 20px max(18px,env(safe-area-inset-bottom))}
+.drive-full .drive-large{height:calc(100dvh - 160px);max-height:none;width:100%;object-fit:contain}
+@media(max-width:500px){.drive-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.drive-card{padding:8px}.drive-card strong{font-size:18px}.drive-title{align-items:start}.drive-bar .btn{font-size:12px}.drive-full h2{overflow-wrap:anywhere;min-width:0}}

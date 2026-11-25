@@ -1,7 +1,7 @@
 import {fileURLToPath} from 'node:url';
 import {writeWorker} from './scripts/build.mjs';
 export default {
-  base:'/Atelie-ARTHEUS/',
+  base:'/atelie-ARTHEUS/',
   plugins:[{
     name:'atelie-cache-local',
     apply:'build',

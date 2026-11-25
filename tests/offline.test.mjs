@@ -28,6 +28,12 @@ test('o worker pré-carrega o app, atende o hash offline e troca somente seu pr�
         const first = [...stored.keys()].find(s => s.startsWith('artheus-'));
         const offline = await new Promise((yes, no) => events.fetch({ request: { method: 'GET', url: scope + '#/ficha', mode: 'navigate' }, respondWith: p => p.then(yes, no) }));
         assert.equal(offline, 'Ateliê');
+        for (const request of [
+            {method:'GET',url:'https://www.googleapis.com/drive/v3/files/one?alt=media'},
+            {method:'GET',url:scope+'app.js',headers:new Headers({Authorization:'Bearer teste'})}
+        ]) {
+            events.fetch({request,respondWith:()=>assert.fail('Conteúdo privado interceptado')});
+        }
         await writeFile(path.join(dir, 'app.js'), 'export const v=2');
         await writeWorker(dir);
         await run();

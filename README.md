@@ -2,7 +2,7 @@
 
 **Universos extraordinários. Sentimentos reais.**
 
-Um grimório digital para criar, ler e refletir. A versão 1.0 roda inteiramente no navegador. O primeiro acesso carrega a aplicação estática. Os registros pessoais ficam no dispositivo.
+Um grimório digital para criar, ler e refletir. A versão 1.1 acrescenta **Meu Acervo**, uma coleção privada no Google Drive. As ferramentas de criação e leitura continuam locais. As instruções de configuração do Google, teste entre aparelhos e atualização do site estão em [GOOGLE_DRIVE_SETUP.md](GOOGLE_DRIVE_SETUP.md).
 
 ## Abrir no computador
 
@@ -30,6 +30,7 @@ Abra **Banco de Ideias**, escolha uma proposta e selecione **Transformar em fich
 | Avaliação Artística | Refletir pelos cinco critérios com radar interativo ou escrever livremente. Salvar, editar e excluir avaliações. |
 | Filtro Criativo | Revisitar cinco perguntas, escrever uma anotação, vincular a uma ficha e reiniciar a reflexão atual. |
 | Banco de Ideias | Filtrar, sortear, favoritar, criar e editar sugestões próprias, excluir as próprias e transformar qualquer proposta em ficha. |
+| Meu Acervo | Conectar o Drive, criar e editar galerias, escolher capas, enviar imagens, registrar anotações e filtrar, mover ou ampliar obras entre dispositivos. |
 
 As ideias de Prisma e Bloodlines são propostas de experimentação. Nesta edição há dois temas, navegação inferior no celular e configurações para backup e restauração.
 
@@ -50,6 +51,7 @@ O navegador separa os dados por endereço, perfil e dispositivo. Use sempre o me
 | `src/sheets.js`, `src/reflection.js`, `src/ideas.js` | Fichas, avaliações, filtro e ideias. |
 | `src/content.js`, `src/icons.js`, `src/ui.js` | Campos e textos iniciais, ícones e controles compartilhados. |
 | `src/data.js`, `src/backup.js` | Acesso aos registros, validação, exportação e restauração. |
+| `src/drive/` | Autorização em memória, API REST, regras do acervo, imagens sob demanda e interface. |
 | `public/` | Ilustração vetorial original, ícones locais e manifest da PWA. |
 | `scripts/`, `tests/` | Servidor local, distribuição estática, geração do cache e testes. |
 | `.github/workflows/pages.yml` | Publicação manual da pasta `dist/` no GitHub Pages. |
@@ -57,14 +59,7 @@ O navegador separa os dados por endereço, perfil e dispositivo. Use sempre o me
 
 ## GitHub Pages
 
-1. Revise o conteúdo autoral acima e aprove a exposição pública.
-2. Crie o repositório independente **Atelie-ARTHEUS** em sua conta. A cópia local está na branch **desenvolvimento/v1**. O projeto Estudo-em-C é independente.
-3. Depois da aprovação, configure o remoto do novo repositório e envie a revisão aprovada. Para o GitHub disponibilizar a ação manual, o arquivo de workflow deve existir na branch padrão.
-4. Em **Settings → Pages → Build and deployment**, escolha **GitHub Actions**.
-5. Em **Actions → Publicar Ateliê no GitHub Pages → Run workflow**, selecione a revisão aprovada e execute. A ação roda os testes, gera a distribuição e publica apenas `dist/`.
-6. Quando a execução terminar, o endereço pretendido é **https://mahgodev.github.io/Atelie-ARTHEUS/**. Esse endereço é o destino planejado desta entrega local.
-
-Para publicação manual em outra hospedagem estática, execute `node scripts/build.mjs` e sirva o conteúdo de `dist/`. Todos os recursos essenciais são locais. O service worker usa uma versão derivada do conteúdo e troca os caches do Ateliê após preparar a edição nova. A instalação PWA requer HTTPS ou localhost e suporte do navegador. A checagem em Safari/iOS físico permanece pendente.
+O projeto utiliza o repositório mahgodev/atelie-ARTHEUS e publicação manual por GitHub Actions. A entrega da V1.1 está na branch local desenvolvimento-v1.1. Para aplicar a atualização ao repositório existente, configurar o Client ID público e publicar a revisão aprovada, siga [GOOGLE_DRIVE_SETUP.md](GOOGLE_DRIVE_SETUP.md).
 
 ## Verificação
 

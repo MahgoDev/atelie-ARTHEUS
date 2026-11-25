@@ -7,16 +7,18 @@ import { sheets } from './sheets.js';
 import { reviews, filter } from './reflection.js';
 import { ideas } from './ideas.js';
 import { settings } from './backup.js';
+import { mountAcervo } from './drive/view.js';
+let leaveAcervo;
 const names = Object.fromEntries(toolsMenu.map(([k, name]) => [k, name]));
-Object.assign(names, { portal: 'Portal', config: 'Configurações' });
-const navgroups = [['Ateliê', ['portal', 'grimorio', 'magia']], ['Criação', ['ficha', 'ideias']], ['Desenvolvimento', ['avaliacao', 'filtro']]];
+Object.assign(names, { portal: 'Portal', config: 'Configurações', acervo: 'Meu Acervo' });
+const navgroups = [['Ateliê', ['portal', 'grimorio', 'magia', 'acervo']], ['Criação', ['ficha', 'ideias']], ['Desenvolvimento', ['avaliacao', 'filtro']]];
 let route = 'portal', activeVersion = 0, suggestion = seeds[0];
 const href = k => '#/' + k;
 const brand = `<a class="brand" href="#/portal" aria-label="Ateliê ARTHEUS, portal">${icon('prism', 40)}<span><i>Ateliê</i><strong>ARTHEUS</strong></span></a>`;
 const navLink = (k, label = names[k]) => `<a href="${href(k)}" ${route === k ? 'aria-current="page"' : ''}>${icon(k, 19)}<span>${esc(label)}</span></a>`;
 const navGroups = () => navgroups.map(([label, keys]) => `<div class="nav-group"><p>${label}</p>${keys.map(k => navLink(k)).join('')}</div>`).join('');
 function shell() {
-    document.querySelector('#sidebar').innerHTML = brand + `<div class="brand-rule"><span>✧</span></div><nav aria-label="Navegação principal">${navGroups()}</nav><div class="side-end">${navLink('config')}<span class="version">Ateliê pessoal <b>·</b> v1.0</span></div>`;
+    document.querySelector('#sidebar').innerHTML = brand + `<div class="brand-rule"><span>✧</span></div><nav aria-label="Navegação principal">${navGroups()}</nav><div class="side-end">${navLink('config')}<span class="version">Ateliê pessoal <b>·</b> v1.1</span></div>`;
     document.querySelector('#topbar').innerHTML = `<div class="crumb">${icon('prism', 17)}<span>Ateliê</span><b>/</b><strong>${names[route]}</strong></div><button class="theme-button" id="theme-toggle"></button>`;
     document.querySelector('#theme-toggle').onclick = () => { theme(document.documentElement.dataset.theme === 'night' ? 'paper' : 'night'); const sel = document.querySelector('#theme-choice'); if (sel)
         sel.value = document.documentElement.dataset.theme; };
@@ -52,6 +54,8 @@ async function portal(root) {
         root.querySelector('#resume').innerHTML = `<a class="resume" href="#/ficha/${encodeURIComponent(items[0].id)}">${icon('pen', 18)} Retomar minha última ficha <strong>${esc(items[0].title)}</strong>${icon('arrow', 16)}</a>`;
 }
 async function render() {
+    leaveAcervo?.();
+    leaveAcervo = undefined;
     const hash = location.hash.replace(/^#\/?/, '');
     const [key, rawId] = hash.split('/');
     let id;
@@ -73,6 +77,9 @@ async function render() {
     main.focus({ preventScroll: true });
     try {
         switch (route) {
+            case 'acervo':
+                leaveAcervo = mountAcervo(view);
+                break;
             case 'portal':
                 await portal(view);
                 break;
