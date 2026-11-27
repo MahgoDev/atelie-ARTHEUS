@@ -9,6 +9,17 @@
 - A versão 1.0 funciona localmente. PDF, imagens de referência privadas, backups pessoais e credenciais ficam fora do Git, do build e de serviços externos. Revise o conteúdo editorial de toda build antes de publicar.
 - Consulte ROADMAP.md para o escopo de cada versão. Upload, acervo, laboratório, prompts, nuvem e IA entram apenas com nova solicitação. A versão atual dispensa autenticação, analytics, anúncios e APIs.
 - Desenvolva em branch independente. Push, merge na main e publicação dependem de aprovação expressa do artista.
-- Na V1.1, somente o Meu Acervo conecta com o Google. Use GIS por token e drive.file, dados em memória por sessão, requisições autenticadas sem cache, IDs e appProperties, verificação de propriedade e de versão. Fichas, avaliações e backups da V1.0 permanecem locais. Consulte GOOGLE_DRIVE_SETUP.md antes de mudar autenticação ou armazenamento.
+- Na V1.1.1, somente o Meu Acervo conecta com o Google.
+  Use GIS por token e escopo drive.file.
+  A sessão utiliza sessionStorage para preservar temporariamente
+  a autorização durante atualizações da página, respeitando
+  a expiração do token.
+  As miniaturas possuem cache limitado em memória RAM.
+  As consultas ao Google Drive foram otimizadas e paralelizadas.
+  Preserve as verificações de propriedade, privacidade,
+  IDs, appProperties e versão dos arquivos.
+  Fichas, avaliações e backups permanecem locais.
+  Consulte GOOGLE_DRIVE_SETUP.md antes de modificar
+  autenticação ou armazenamento.
 - Antes da entrega, salve as alterações, execute `node --test` e `node scripts/build.mjs`, confira os fluxos afetados e atualize PROGRESS.md.
 

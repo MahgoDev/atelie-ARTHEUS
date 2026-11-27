@@ -67,3 +67,20 @@ Depois de aprovar a revisão, faça o commit e envie a branch ao seu repositóri
 - [Escopos da API do Drive](https://developers.google.com/workspace/drive/api/guides/api-specific-auth)
 - [Uploads retomáveis](https://developers.google.com/workspace/drive/api/guides/manage-uploads)
 - [Propriedades de arquivos do aplicativo](https://developers.google.com/workspace/drive/api/guides/properties)
+## Atualização V1.1.1
+
+A autorização temporária do Google Drive agora é
+preservada em sessionStorage, permitindo atualizar
+a página sem solicitar uma nova conexão enquanto
+o token permanecer válido.
+
+A expiração do token continua sendo respeitada.
+Desconectar ou trocar de conta remove a sessão anterior.
+
+O aplicativo não utiliza refresh tokens ou Client Secret.
+
+As imagens permanecem privadas no Google Drive.
+As miniaturas utilizam cache temporário em memória RAM.
+
+O cache persistente via IndexedDB e o armazenamento
+de miniaturas no Drive estão planejados para a V1.2.

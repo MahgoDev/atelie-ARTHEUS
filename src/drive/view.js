@@ -100,7 +100,7 @@ export function mountAcervo(root) {
                 showStatus('Google pronto. Toque em Conectar ao Google Drive para abrir a janela.');
             return;
         }
-        session.authorize(id);
+        session.authorize(id, undefined, '');
     }
     function frame() {
         unwatch();
@@ -354,8 +354,14 @@ export function mountAcervo(root) {
                 return session.clear('Conta desconectada.', true);
             if (a === 'switch') {
                 const id = configuredId();
-                session.clear();
-                return session.authorize(id);
+                if (!identityReady) {
+                    showStatus('Carregando a autorização do Google…');
+                    await prepareGIS();
+                    if (alive)
+                        showStatus(identityReady ? 'Google pronto. Toque novamente em Trocar de conta.' : loadError, !identityReady);
+                    return;
+                }
+                return session.authorize(id, undefined, 'select_account');
             }
             if (!session.connected) {
                 session.clear('Reconecte ao Google Drive.');
@@ -416,10 +422,8 @@ export function mountAcervo(root) {
     on(window, 'focus', resume);
     on(document, 'visibilitychange', resume);
     on(window, 'online', () => { void prepareGIS(); resume(); });
+    on(window, 'offline', () => showStatus('Sem internet. A sessão válida será preservada.', true));
     changed();
-    if (!session.connected)
-        void prepareGIS();
+    void prepareGIS();
     return () => { alive = false; clear(); subscriptions.abort(); root.onclick = null; root.oninput = null; };
 }
-window.addEventListener('offline', () => session.clear('Sem internet. Reconecte ao Google quando estiver online.'));
-window.addEventListener('pagehide', () => session.clear('Reconecte para abrir seu acervo.'));

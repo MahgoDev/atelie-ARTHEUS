@@ -62,3 +62,45 @@ O build Node inclui 27 recursos locais no pré-cache e gera a versão do service
 - Chrome: build exercitada com GIS e Drive simulados, imagem PNG de teste, upload otimizado, ampliação, edição de capa, movimento, filtros, desconexão, troca de conta e retorno às fichas. Layout do acervo conferido em 390×844, 820×1180 e 1440×900. Regressão dos fluxos da V1.0 aprovada no Chrome, incluindo fichas, radar, leitura e backup.
 - Configuração: build conferida com Client ID público fictício e repetida sem valor. O pacote final usa o campo configurável. Os arquivos-base alterados foram conferidos contra os identificadores de conteúdo da main do projeto no GitHub.
 - Pendente: OAuth real com a conta de teste, acesso às mesmas obras em dois aparelhos, quotas reais, bloqueio de popups e retorno do consentimento no Safari/PWA físico. O cache offline foi exercitado em simulação. A revisão local aguarda aprovação de envio e publicação.
+## V1.1.1 - Estabilidade e desempenho
+
+Melhorias implementadas:
+- Correção do carregamento de imagens privadas do Google Drive.
+- Centralização visual das obras, títulos e descrições.
+- Paralelização de consultas ao Google Drive.
+- Otimização da recuperação de galerias.
+- Cache de miniaturas em memória RAM.
+- Persistência temporária da sessão via sessionStorage.
+- Preservação da sessão ao atualizar a página.
+- Correção do workflow de publicação no GitHub Pages.
+
+Validação:
+- 20 testes automatizados aprovados.
+- Build executado com sucesso.
+- Persistência da sessão confirmada em ambiente local.
+- Tempo de carregamento observado de aproximadamente 4 segundos.
+
+Próximos desenvolvimentos:
+
+V1.2 - Acervo Inteligente
+- Cache persistente com IndexedDB.
+- Miniaturas privadas armazenadas no Google Drive.
+- Cache limitado de imagens completas em RAM.
+- Carregamento progressivo.
+- Sincronização do acervo em segundo plano.
+- Upload de múltiplas ilustrações.
+- Cadastro dinâmico de tags.
+- Histórico de tags.
+- Reutilização da última combinação de tags.
+
+V1.3 - Ateliê Conectado
+- Sincronização das ferramentas entre dispositivos.
+- Migração segura dos registros locais.
+- Funcionamento offline.
+- Fila persistente de sincronização.
+- Tratamento de conflitos.
+- Backups e recuperação.
+
+A V1.2 será desenvolvida manualmente.
+A V1.3 será desenvolvida pelo Codex em uma branch
+independente, para integração posterior.
