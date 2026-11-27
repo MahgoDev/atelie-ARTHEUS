@@ -1,5 +1,6 @@
 
 import { types } from './collection.js';
+import { readThumbnail, writeThumbnail } from './cache.js';
 
 
 /* ========================================
@@ -388,6 +389,20 @@ export function observeImages(
              * ainda não estiver disponível no cache.
              */
 
+            const stored = await readThumbnail(collection.api, s.work);
+            controller.signal.throwIfAborted();
+            if (!isCurrent() || !s.visible) return;
+
+            if (stored) {
+                // Revalida propriedade, pasta e versão antes de exibir dados privados locais.
+                await collection.artwork(s.work, s.work.version);
+                controller.signal.throwIfAborted();
+                if (!isCurrent() || !s.visible) return;
+                saveCached(cache, key, stored);
+                show(el, s, stored);
+                return;
+            }
+
             const blob = await collection.image(
                 s.work,
                 controller.signal
@@ -418,6 +433,8 @@ export function observeImages(
             saveCached(cache, key, thumb);
 
             show(el, s, thumb);
+            // A escrita é opcional; indisponibilidade do IndexedDB não quebra o acervo.
+            void writeThumbnail(collection.api, s.work, thumb);
 
         } catch {
 

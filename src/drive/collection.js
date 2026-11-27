@@ -655,7 +655,7 @@ export class Collection {
 
         signal?.throwIfAborted();
 
-        const file = await this.artwork(work);
+        const file = await this.artwork(work, work.version);
 
         if (
             Number(file.size) > 32 * 1024 * 1024
