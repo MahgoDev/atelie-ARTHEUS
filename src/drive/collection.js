@@ -33,7 +33,7 @@ const valid = (file, role, parent) =>
     file.appProperties?.atelier === app &&
     file.appProperties.role === role &&
     (
-        role === 'work'
+        ['work', 'thumbnail'].includes(role)
             ? types.includes(file.mimeType)
             : file.mimeType === folderType
     ) &&
@@ -259,7 +259,7 @@ export class Collection {
             'Ateliê ARTHEUS'
         );
 
-        const [group] = await Promise.all([
+        const [group, data] = await Promise.all([
             this.ensure(
                 this.root.id,
                 'group',
@@ -274,6 +274,7 @@ export class Collection {
         ]);
 
         this.group = group;
+        this.data = data;
 
         /*
          * Consulta todas as galerias existentes de uma vez,
@@ -648,6 +649,78 @@ export class Collection {
         });
     }
 
+
+    /* Miniaturas privadas, separadas dos originais. */
+    async thumbnailFolder() {
+        await Promise.all([
+            this.guard(this.root.id, 'root'),
+            this.guard(this.data.id, 'data', this.root.id)
+        ]);
+        if (!this.thumbnailFolderPromise) {
+            this.thumbnailFolderPromise = this.ensure(this.data.id, 'thumbnails', 'Miniaturas')
+                .catch(err => { this.thumbnailFolderPromise = null; throw err; });
+        }
+        const folder = await this.thumbnailFolderPromise;
+        try { return await this.guard(folder.id, 'thumbnails', this.data.id); }
+        catch (err) { this.thumbnailFolderPromise = null; throw err; }
+    }
+
+    thumbnailSource(work) {
+        return work.md5Checksum ? 'md5:' + work.md5Checksum : 'version:' + work.version;
+    }
+
+    async findThumbnail(work, folder) {
+        const source = this.thumbnailSource(work);
+        const q = children(folder.id) + ' and ' + managed +
+            " and appProperties has { key='role' and value='thumbnail' }" +
+            " and appProperties has { key='workId' and value=" + quoted(work.id) + ' }' +
+            " and appProperties has { key='source' and value=" + quoted(source) + ' }';
+        const rows = (await this.api.list(q)).filter(f =>
+            valid(f, 'thumbnail', folder.id) && f.appProperties.workId === work.id &&
+            f.appProperties.source === source && f.appProperties.profile === '480-v1' &&
+            Number(f.size) > 0 && Number(f.size) <= 2 * 1024 * 1024);
+        return rows.sort((a,b) => a.id.localeCompare(b.id))[0] || null;
+    }
+
+    async readRemoteThumbnail(work) {
+        const file = await this.artwork(work, work.version);
+        const folder = await this.thumbnailFolder();
+        const item = await this.findThumbnail(file, folder);
+        if (!item) return null;
+        const checked = await this.guard(item.id, 'thumbnail', folder.id, item.version);
+        if (checked.appProperties.workId !== file.id ||
+            checked.appProperties.source !== this.thumbnailSource(file) ||
+            checked.appProperties.profile !== '480-v1' ||
+            Number(checked.size) > 2 * 1024 * 1024) return null;
+        const blob = await this.api.media(checked.id, this.api.signal);
+        if (!types.includes(blob.type) || !blob.size || blob.size > 2 * 1024 * 1024) return null;
+        return blob;
+    }
+
+    async saveRemoteThumbnail(work, blob) {
+        if (!types.includes(blob.type) || !blob.size || blob.size > 2 * 1024 * 1024) return false;
+        const file = await this.artwork(work, work.version);
+        const folder = await this.thumbnailFolder();
+        const create = async () => {
+            if (await this.findThumbnail(file, folder)) return true;
+            await this.artwork(file, file.version);
+            await this.guard(folder.id, 'thumbnails', this.data.id);
+            const extension = {'image/webp':'webp','image/png':'png','image/jpeg':'jpg'}[blob.type];
+            await this.api.upload({
+                name: file.id + '_480.' + extension,
+                mimeType: blob.type,
+                parents: [folder.id],
+                appProperties: marker('thumbnail', {
+                    workId: file.id, source: this.thumbnailSource(file), profile: '480-v1'
+                })
+            }, blob);
+            return true;
+        };
+        // Web Locks serializa criações entre abas da mesma origem, quando disponível.
+        return globalThis.navigator?.locks
+            ? navigator.locks.request('artheus-thumb-' + folder.id + '-' + file.id, create)
+            : create();
+    }
 
     /* Carregamento de imagens privadas */
 

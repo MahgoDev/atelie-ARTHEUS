@@ -184,7 +184,7 @@ export async function validateFile(file) {
    REDIMENSIONAMENTO DE IMAGENS
    ======================================== */
 
-export async function resizeImage(blob, maxSide) {
+export async function resizeImage(blob, maxSide, thumbnail = false) {
 
     const url = URL.createObjectURL(blob);
 
@@ -237,7 +237,7 @@ export async function resizeImage(blob, maxSide) {
             canvas.toBlob(
                 resolve,
 
-                blob.type === 'image/jpeg'
+                !thumbnail && blob.type === 'image/jpeg'
                     ? 'image/jpeg'
                     : 'image/webp',
 
@@ -265,6 +265,64 @@ export async function resizeImage(blob, maxSide) {
     }
 }
 
+
+// Uma tarefa por obra/versão e sessão, inclusive entre galerias.
+const thumbnailJobs = new WeakMap();
+const remoteReady = new WeakMap();
+function sessionMap(container, owner) {
+    let map = container.get(owner);
+    if (!map) { map = new Map(); container.set(owner, map); }
+    return map;
+}
+
+export async function prepareThumbnail(collection, work, original) {
+    const owner = collection.api.signal;
+    owner.throwIfAborted();
+    const key = cacheKey(work);
+    const jobs = sessionMap(thumbnailJobs, owner);
+    if (jobs.has(key)) return jobs.get(key);
+    const ready = sessionMap(remoteReady, owner);
+    const job = (async () => {
+        const cache = getCache(owner);
+        await collection.artwork(work, work.version);
+        let thumb = getCached(cache, key) || await readThumbnail(collection.api, work);
+        if (!thumb && original) thumb = await resizeImage(original, THUMB_SIZE, true);
+        if (!thumb) {
+            try {
+                thumb = await collection.readRemoteThumbnail(work);
+                if (thumb) { await validateFile(thumb); ready.set(key, true); }
+            } catch { thumb = null; }
+        }
+        owner.throwIfAborted();
+        if (!thumb) thumb = await resizeImage(await collection.image(work, owner), THUMB_SIZE, true);
+        owner.throwIfAborted();
+        saveCached(cache, key, thumb);
+        void writeThumbnail(collection.api, work, thumb);
+        return thumb;
+    })();
+    jobs.set(key, job);
+    try { return await job; } finally { if (jobs.get(key) === job) jobs.delete(key); }
+}
+
+const remoteJobs = new WeakMap();
+export async function persistRemoteThumbnail(collection, work, thumb) {
+    const owner = collection.api.signal;
+    if (owner.aborted) return false;
+    const key = cacheKey(work);
+    const ready = sessionMap(remoteReady, owner);
+    if (ready.has(key)) return true;
+    const jobs = sessionMap(remoteJobs, owner);
+    if (jobs.has(key)) return jobs.get(key);
+    const job = (async () => {
+        try {
+            const ok = await collection.saveRemoteThumbnail(work, thumb);
+            if (ok) ready.set(key, true);
+            return ok;
+        } catch { return false; }
+    })();
+    jobs.set(key, job);
+    try { return await job; } finally { if (jobs.get(key) === job) jobs.delete(key); }
+}
 
 /* ========================================
    CARREGAMENTO INTELIGENTE DAS MINIATURAS
@@ -389,52 +447,10 @@ export function observeImages(
              * ainda não estiver disponível no cache.
              */
 
-            const stored = await readThumbnail(collection.api, s.work);
-            controller.signal.throwIfAborted();
-            if (!isCurrent() || !s.visible) return;
-
-            if (stored) {
-                // Revalida propriedade, pasta e versão antes de exibir dados privados locais.
-                await collection.artwork(s.work, s.work.version);
-                controller.signal.throwIfAborted();
-                if (!isCurrent() || !s.visible) return;
-                saveCached(cache, key, stored);
-                show(el, s, stored);
-                return;
-            }
-
-            const blob = await collection.image(
-                s.work,
-                controller.signal
-            );
-
-            controller.signal.throwIfAborted();
-
-            if (!isCurrent() || !s.visible) {
-                return;
-            }
-
-            const thumb = await resizeImage(
-                blob,
-                THUMB_SIZE
-            );
-
-            controller.signal.throwIfAborted();
-
-            if (!isCurrent() || !s.visible) {
-                return;
-            }
-
-            /*
-             * Guarda a miniatura para reutilização
-             * nas capas e nas próximas galerias.
-             */
-
-            saveCached(cache, key, thumb);
-
-            show(el, s, thumb);
-            // A escrita é opcional; indisponibilidade do IndexedDB não quebra o acervo.
-            void writeThumbnail(collection.api, s.work, thumb);
+            const thumb = await prepareThumbnail(collection, s.work);
+            if (isCurrent() && s.visible && !controller.signal.aborted) show(el, s, thumb);
+            // Não bloqueia a exibição. Mantém a fila limitada durante a migração.
+            await persistRemoteThumbnail(collection, s.work, thumb);
 
         } catch {
 

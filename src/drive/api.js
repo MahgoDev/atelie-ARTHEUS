@@ -1,6 +1,6 @@
 const api = 'https://www.googleapis.com/drive/v3/files';
 const uploadApi = 'https://www.googleapis.com/upload/drive/v3/files';
-export const fields = 'id,name,description,mimeType,parents,appProperties,version,createdTime,modifiedTime,trashed,ownedByMe,shared,size';
+export const fields = 'id,name,description,mimeType,parents,appProperties,version,createdTime,modifiedTime,trashed,ownedByMe,shared,size,md5Checksum';
 export const conflict = 'Este item mudou em outro dispositivo. Feche o editor, atualize o acervo e confira a versão mais recente.';
 const escapeQuery = s => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 export const quoted = value => "'" + escapeQuery(value) + "'";

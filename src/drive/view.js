@@ -2,7 +2,7 @@ import { GOOGLE_CLIENT_ID, validClientId } from './config.js';
 import { session, loadIdentity } from './auth.js';
 import { DriveApi } from './api.js';
 import { Collection, states } from './collection.js';
-import { observeImages, resizeImage, validateFile } from './images.js';
+import { observeImages, resizeImage, validateFile, prepareThumbnail, persistRemoteThumbnail } from './images.js';
 import { esc, heading } from '../ui.js';
 import { icon } from '../icons.js';
 const idKey = 'atelier-drive-client-id';
@@ -311,7 +311,13 @@ export function mountAcervo(root) {
                 const blob = f.mode === 'optimized' ? await resizeImage(f.file, 2560) : f.file;
                 if (!d.alive)
                     return;
-                await service.add(blob, f, p => feedback.textContent = 'Enviando… ' + Math.round(p * 100) + '%');
+                const saved = await service.add(blob, f, p => feedback.textContent = 'Enviando… ' + Math.round(p * 100) + '%');
+                // O original já foi salvo. Uma falha na miniatura não deve induzir novo upload.
+                try {
+                    feedback.textContent = 'Preparando miniatura…';
+                    const thumb = await prepareThumbnail(service, saved, blob);
+                    await persistRemoteThumbnail(service, saved, thumb);
+                } catch { /* A próxima visualização tentará novamente. */ }
             });
         };
         if (work)
