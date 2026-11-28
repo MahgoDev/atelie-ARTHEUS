@@ -2,7 +2,7 @@ import { GOOGLE_CLIENT_ID, validClientId } from './config.js';
 import { session, loadIdentity } from './auth.js';
 import { DriveApi } from './api.js';
 import { Collection, states } from './collection.js';
-import { observeImages, resizeImage, validateFile, prepareThumbnail, persistRemoteThumbnail } from './images.js';
+import { observeImages, resizeImage, validateFile, prepareThumbnail, persistRemoteThumbnail, loadOriginal } from './images.js';
 import { esc, heading } from '../ui.js';
 import { icon } from '../icons.js';
 const idKey = 'atelier-drive-client-id';
@@ -327,24 +327,51 @@ export function mountAcervo(root) {
             };
     }
     async function viewWork(w) {
-        const d = dialog(w.name, `<img class="drive-large" alt="${esc(w.name)}" hidden><p>${esc(w.info.description)}</p>`, true);
+        const source = collection;
+        const owner = source.api.signal;
+        const d = dialog(w.name, `<img class="drive-large" alt="${esc(w.name)}" hidden><p>${esc(w.info.description)}</p><button type="button" class="btn" data-retry hidden>Tentar novamente</button>`, true);
         const feedback = d.el.querySelector('[data-feedback]');
-        feedback.textContent = 'Carregando a imagem privada…';
-        try {
-            const blob = await collection.image(w);
-            if (!d.alive)
-                return;
-            const url = URL.createObjectURL(blob);
-            d.dispose = () => URL.revokeObjectURL(url);
-            const img = d.el.querySelector('img');
-            img.src = url;
-            img.hidden = false;
-            feedback.textContent = '';
+        const img = d.el.querySelector('img');
+        const retry = d.el.querySelector('[data-retry]');
+        let url = '', full = false, failed = false, loading = false;
+        const valid = () => d.alive && !owner.aborted && collection === source;
+        d.dispose = () => { img.removeAttribute('src'); if (url) URL.revokeObjectURL(url); url = ''; };
+        async function display(blob, original) {
+            if (!valid() || (!original && full)) return;
+            const next = URL.createObjectURL(blob);
+            try {
+                const decoded = new Image(); decoded.src = next;
+                await decoded.decode();
+                if (!valid() || (!original && full)) return;
+                const previous = url;
+                url = next; img.src = next; img.hidden = false;
+                if (original) full = true;
+                if (previous) URL.revokeObjectURL(previous);
+            } finally { if (url !== next) URL.revokeObjectURL(next); }
         }
-        catch (err) {
-            if (d.alive)
-                feedback.textContent = explain(err);
+        async function original() {
+            if (!valid() || loading || full) return;
+            loading = true; failed = false; retry.hidden = true;
+            feedback.textContent = 'Carregando original em alta resolução…';
+            try {
+                await display(await loadOriginal(source, w), true);
+                if (valid()) feedback.textContent = '';
+            } catch (err) {
+                failed = true;
+                if (valid()) { feedback.textContent = explain(err); retry.hidden = false; }
+            } finally { loading = false; }
         }
+        retry.onclick = () => void original();
+        // A prévia não deve atrasar nem substituir um original já exibido.
+        void (async () => {
+            try {
+                const thumb = await prepareThumbnail(source, w);
+                await display(thumb, false);
+                if (valid() && !full && !failed) feedback.textContent = 'Prévia · carregando original em alta resolução…';
+                if (valid()) void persistRemoteThumbnail(source, w, thumb);
+            } catch { /* O original continua sendo carregado. */ }
+        })();
+        await original();
     }
     root.onclick = async (e) => {
         if (e.target.closest('dialog'))

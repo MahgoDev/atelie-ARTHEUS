@@ -266,6 +266,52 @@ export async function resizeImage(blob, maxSide, thumbnail = false) {
 }
 
 
+// Originais privados: cache por sessão, limitado a 64 MiB e 8 arquivos.
+const originalCaches = new WeakMap();
+const ORIGINAL_LIMIT = 64 * 1024 * 1024;
+export async function loadOriginal(collection, work) {
+    const owner = collection.api.signal;
+    owner.throwIfAborted();
+    const key = cacheKey(work);
+    if (!key) return collection.image(work, owner);
+    let cache = originalCaches.get(owner);
+    if (!cache) {
+        cache = { items: new Map(), jobs: new Map(), bytes: 0 };
+        originalCaches.set(owner, cache);
+        owner.addEventListener('abort', () => {
+            cache.items.clear(); cache.jobs.clear(); cache.bytes = 0;
+            originalCaches.delete(owner);
+        }, { once: true });
+    }
+    if (cache.jobs.has(key)) return cache.jobs.get(key);
+    const job = (async () => {
+        // Mesmo em cache, confirme propriedade, privacidade e versão.
+        const cached = cache.items.get(key);
+        if (cached) {
+            await collection.artwork(work, work.version);
+            owner.throwIfAborted();
+            if (cache.items.has(key)) {
+                cache.items.delete(key); cache.items.set(key, cached);
+            }
+            return cached;
+        }
+        const blob = await collection.image(work, owner);
+        owner.throwIfAborted();
+        if (blob.size <= ORIGINAL_LIMIT) {
+            cache.items.set(key, blob); cache.bytes += blob.size;
+            while (cache.bytes > ORIGINAL_LIMIT || cache.items.size > 8) {
+                const oldest = cache.items.keys().next().value;
+                cache.bytes -= cache.items.get(oldest).size;
+                cache.items.delete(oldest);
+            }
+        }
+        return blob;
+    })();
+    cache.jobs.set(key, job);
+    try { return await job; }
+    finally { if (cache.jobs.get(key) === job) cache.jobs.delete(key); }
+}
+
 // Uma tarefa por obra/versão e sessão, inclusive entre galerias.
 const thumbnailJobs = new WeakMap();
 const remoteReady = new WeakMap();
@@ -294,7 +340,7 @@ export async function prepareThumbnail(collection, work, original) {
             } catch { thumb = null; }
         }
         owner.throwIfAborted();
-        if (!thumb) thumb = await resizeImage(await collection.image(work, owner), THUMB_SIZE, true);
+        if (!thumb) thumb = await resizeImage(await loadOriginal(collection, work), THUMB_SIZE, true);
         owner.throwIfAborted();
         saveCached(cache, key, thumb);
         void writeThumbnail(collection.api, work, thumb);
